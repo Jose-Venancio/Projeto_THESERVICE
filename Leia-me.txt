@@ -1,0 +1,7 @@
+backend/
+├── config/           # Configurações do banco de dados
+├── models/           # Modelos (tabelas)
+├── routes/           # Rotas da API
+├── controllers/      # Controladores (lógica das rotas)
+├── index.js          # Arquivo principal
+└── package.json      # Gerenciamento de dependências
