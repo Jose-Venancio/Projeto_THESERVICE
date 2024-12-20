@@ -1,0 +1,85 @@
+CREATE TABLE usuarios (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    senha VARCHAR(60) NOT NULL,
+    tipo VARCHAR(10) NOT NULL,
+	endereco VARCHAR(255) NOT NULL,
+    data_cadastro TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
+    status VARCHAR(10) NOT NULL DEFAULT 'ativo'
+);
+
+CREATE TABLE serviços (
+    id SERIAL PRIMARY KEY,
+    nome_servico VARCHAR(150) NOT NULL,
+    categoria VARCHAR(50) NOT NULL,
+    descricao TEXT NOT NULL,
+    preco_estimado NUMERIC NOT NULL,
+    status VARCHAR(15) NOT NULL DEFAULT 'disponível',
+    data_criacao TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp
+);
+
+CREATE TABLE profissionais (
+    id SERIAL PRIMARY KEY,
+    id_usuario INTEGER NOT NULL REFERENCES usuarios(id),
+    especialidade VARCHAR(50) NOT NULL,
+    avaliacoes NUMERIC CHECK(avaliacoes BETWEEN 0 AND 5),
+    localizacao VARCHAR(100) NOT NULL,
+    experiencia INTEGER NOT NULL
+);
+CREATE TABLE contratos (
+    id SERIAL PRIMARY KEY,
+    id_cliente INTEGER NOT NULL REFERENCES usuarios(id),
+    id_profissional INTEGER NOT NULL REFERENCES profissionais(id),
+    id_servico INTEGER NOT NULL REFERENCES serviços(id),
+    status_contrato VARCHAR(15) NOT NULL DEFAULT 'aberto',
+    data_inicio TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
+    data_conclusao TIMESTAMP WITH TIME ZONE
+);
+CREATE TABLE avaliacoes (
+    id SERIAL PRIMARY KEY,
+    id_cliente INTEGER NOT NULL REFERENCES usuarios(id),
+    id_profissional INTEGER NOT NULL REFERENCES profissionais(id),
+    comentario TEXT NOT NULL,
+    nota INTEGER CHECK(nota BETWEEN 1 AND 5),
+    data_avaliacao TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp
+);
+CREATE TABLE faturas (
+    id SERIAL PRIMARY KEY,
+    id_contrato INTEGER NOT NULL REFERENCES contratos(id),
+    valor_total NUMERIC NOT NULL,
+    pagamento VARCHAR(15) NOT NULL DEFAULT 'pendente',
+    data_emissao TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
+    data_vencimento TIMESTAMP WITH TIME ZONE
+);
+
+INSERT INTO usuarios (nome, email, senha, tipo, data_cadastro, status)
+VALUES 
+('Maria Silva', 'maria.silva@email.com', 'senha123', 'cliente', '2024-12-11 00:00:00', 'ativo'),
+('João Lima', 'joao.lima@email.com', 'senha456', 'cliente', '2024-12-11 00:00:00', 'ativo'),
+('Carla Santos', 'carla.santos@email.com', 'senha789', 'cliente', '2024-12-11 00:00:00', 'ativo');
+
+INSERT INTO serviços (nome_servico, categoria, descricao, preco_estimado, status, data_criacao)
+VALUES 
+('Pintura Residencial', 'Pintura', 'Pintura de interiores', 150.00, 'disponível', '2024-12-11 00:00:00'),
+('Manutenção Elétrica', 'Elétrica', 'Manutenção de quadros', 120.00, 'disponível', '2024-12-11 00:00:00');
+
+INSERT INTO profissionais (id_usuario, especialidade, avaliacoes, localizacao, experiencia)
+VALUES 
+(1, 'Pintor', 4.5, 'São Paulo, SP', 8),
+(2, 'Eletricista', 4.7, 'Rio de Janeiro, RJ', 10);
+
+INSERT INTO contratos (id_cliente, id_profissional, id_servico, status_contrato, data_inicio, data_conclusao)
+VALUES 
+(1, 1, 1, 'Em andamento', '2024-12-11 00:00:00', NULL),
+(2, 2, 2, 'Concluído', '2024-12-01 00:00:00', '2024-12-10 00:00:00');
+
+INSERT INTO avaliacoes (id_cliente, id_profissional, comentario, nota, data_avaliacao)
+VALUES 
+(1, 1, 'Ótimo trabalho!', 5, '2024-12-11 00:00:00'),
+(2, 2, 'Serviço excelente', 4.8, '2024-12-09 00:00:00');
+
+INSERT INTO faturas (id_contrato, valor_total, pagamento, data_emissao, data_vencimento)
+VALUES 
+(1, 150.00, 'cartão', '2024-12-11 00:00:00', '2024-12-25 00:00:00'),
+(2, 120.00, 'boleto', '2024-12-01 00:00:00', '2024-12-15 00:00:00');
